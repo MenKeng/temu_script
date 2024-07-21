@@ -68,6 +68,7 @@ function price_cut() {
         if (div.scrollTop + div.clientHeight < div.scrollHeight) {
             setTimeout(scrollAndClick, scrollInterval)
         } else {
+            scrollAndClick()
             var button = document.getElementById("拒绝降价")
             if (button) {
                 button.remove()
@@ -136,10 +137,3 @@ function showPopup(message, duration = 5000, color = "red") {
         document.body.removeChild(popup)
     }, duration)
 }
-
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-
-
-$ git config user.name "Mzw"
-$ git config user.email "466271552@qq.com"
