@@ -55,30 +55,33 @@ function shop_page() {
         addData(shopData, shop_name, product_id)
     })
     localStorage.setItem("shopData", JSON.stringify(shopData))
-    console.log("已记录店铺数据", shopData.length, "条记录")
+    console.log("已记录店铺数据")
 }
-function search_page() {}
-function create_copy_button_product() {
+function search_page() {
     var product_list = document.querySelectorAll(".EKDT7a3v")
     product_list.forEach((product) => {
         var id_dom = product.querySelectorAll("div")[1]
         var id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
+        console.log(id);
+        var shop_data = localStorage_getStorage("shopData")[id] ? localStorage_getStorage("shopData")[id] : "未知店铺"
         var button = document.createElement("button")
-        button.innerText = id
-        button.classList.add("copy-button")
+        button.innerText = shop_data
+        button.classList.add("shop_button")
         button.style.backgroundColor = "rgba(255, 255, 255, 0.2)"
         button.style.cssText = "padding: 10px 15px; border: none; cursor: pointer;z-index: 99999;color:black"
         button.onclick = function () {
             event.stopPropagation()
-            tool.copy(id)
         }
         id_dom.appendChild(button)
     })
 }
 // ---------------------------------------------------工具类---------------------------------------------------
-function localStorage_getstorage(name) {
+function localStorage_getStorage(name) {
     var data = localStorage.getItem(name)
     return data ? JSON.parse(data) : {}
+}
+function localStorage_getData(name, data) {
+    
 }
 function addData(storage, key, value) {
     if (!storage[key]) {
@@ -88,6 +91,7 @@ function addData(storage, key, value) {
         storage[key].push(value)
     }
 }
+
 // 自动记录搜索关键字
 
 // 搜索页面自动显示id对应的店铺名称
@@ -119,5 +123,5 @@ function formatSize(size) {
     }
 }
 
-const size = getLocalStorageSize()
-console.log("LocalStorage 所用容量: " + formatSize(size))
+// const size = getLocalStorageSize()
+// console.log("LocalStorage 所用容量: " + formatSize(size))
