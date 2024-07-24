@@ -57,10 +57,24 @@ function shop_page() {
     localStorage.setItem("shopData", JSON.stringify(shopData))
     console.log("已记录店铺数据", shopData.length, "条记录")
 }
-function search_page() {
-    
+function search_page() {}
+function create_copy_button_product() {
+    var product_list = document.querySelectorAll(".EKDT7a3v")
+    product_list.forEach((product) => {
+        var id_dom = product.querySelectorAll("div")[1]
+        var id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
+        var button = document.createElement("button")
+        button.innerText = id
+        button.classList.add("copy-button")
+        button.style.backgroundColor = "rgba(255, 255, 255, 0.2)"
+        button.style.cssText = "padding: 10px 15px; border: none; cursor: pointer;z-index: 99999;color:black"
+        button.onclick = function () {
+            event.stopPropagation()
+            tool.copy(id)
+        }
+        id_dom.appendChild(button)
+    })
 }
-
 // ---------------------------------------------------工具类---------------------------------------------------
 function localStorage_getstorage(name) {
     var data = localStorage.getItem(name)
