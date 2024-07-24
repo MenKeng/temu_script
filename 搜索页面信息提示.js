@@ -15,11 +15,9 @@
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
-console.log("搜索页面信息提示脚本已启动")
 // this.$ = this.jQuery = jQuery.noConflict(true)
 var reg_shop_href = /https:\/\/www\.temu\.com\/.*-m-\d{15}.html/
 var reg_search_href = /https:\/\/www\.temu\.com\/search_result\.html\?search_key=/
-// 自动记录店铺后台id与店铺名称
 // 监听 popstate 事件
 window.addEventListener("popstate", function (event) {
     checkUrl()
@@ -33,9 +31,6 @@ window.onload = function () {
 
 function checkUrl() {
     var url = window.location.href
-    // console.log(url)
-    // console.log("reg_shop_href", url.match(reg_shop_href))
-    // console.log("reg_search_href", url.match(reg_search_href))
     if (reg_shop_href.test(url)) {
         console.log("店铺页面")
         shop_page()
@@ -58,14 +53,19 @@ function shop_page() {
     console.log("已记录店铺数据")
 }
 function search_page() {
+    var item_count = 0
     var product_list = document.querySelectorAll(".EKDT7a3v")
-    product_list.forEach((product) => {
+    var shop_data = localStorage_getStorage("shopData")
+    product_list.forEach(async (product) => {
+        item_count++
+        if (item_count > 12) {
+            await sleep(100)
+        }
         var id_dom = product.querySelectorAll("div")[1]
         var id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
-        console.log(id);
-        var shop_data = localStorage_getStorage("shopData")[id] ? localStorage_getStorage("shopData")[id] : "未知店铺"
+        var shop_name = findKeyByName(shop_data, id)
         var button = document.createElement("button")
-        button.innerText = shop_data
+        button.innerText = shop_name
         button.classList.add("shop_button")
         button.style.backgroundColor = "rgba(255, 255, 255, 0.2)"
         button.style.cssText = "padding: 10px 15px; border: none; cursor: pointer;z-index: 99999;color:black"
@@ -76,12 +76,33 @@ function search_page() {
     })
 }
 // ---------------------------------------------------工具类---------------------------------------------------
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
 function localStorage_getStorage(name) {
     var data = localStorage.getItem(name)
     return data ? JSON.parse(data) : {}
 }
-function localStorage_getData(name, data) {
-    
+// 创建反向映射
+function createReverseMap(data) {
+    const reverseMap = new Map()
+    for (let key in data) {
+        if (data.hasOwnProperty(key)) {
+            data[key].forEach((item) => {
+                reverseMap.set(item, key)
+            })
+        }
+    }
+    return reverseMap
+}
+
+function findKeyByItem(reverseMap, itemToFind) {
+    return reverseMap.get(itemToFind) || null
+}
+
+function findKeyByName(data, itemToFind) {
+    const reverseMap = createReverseMap(data)
+    return findKeyByItem(reverseMap, itemToFind)
 }
 function addData(storage, key, value) {
     if (!storage[key]) {
@@ -91,37 +112,12 @@ function addData(storage, key, value) {
         storage[key].push(value)
     }
 }
-
+// todo
 // 自动记录搜索关键字
 
-// 搜索页面自动显示id对应的店铺名称
-// 多个店铺显示相同的颜色标记
+// 多个店铺显示相同的颜色标记,计数
 
 // 手动清空数据按钮
 // (可选店铺清空数据按钮)
 
-// 预计增加价格变化曲线,本地存储数据可行性
-
-function getLocalStorageSize() {
-    let totalSize = 0
-
-    for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-            totalSize += localStorage[key].length * 2 // 每个字符占用2个字节
-        }
-    }
-    return totalSize
-}
-
-function formatSize(size) {
-    if (size < 1024) {
-        return size + " B"
-    } else if (size < 1024 * 1024) {
-        return (size / 1024).toFixed(2) + " KB"
-    } else {
-        return (size / (1024 * 1024)).toFixed(2) + " MB"
-    }
-}
-
-// const size = getLocalStorageSize()
-// console.log("LocalStorage 所用容量: " + formatSize(size))
+// 预计增加价格变化曲线
