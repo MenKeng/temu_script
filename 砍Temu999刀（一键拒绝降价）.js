@@ -50,16 +50,16 @@ setTimeout(() => {
 }, 2000)
 
 function price_cut() {
-    var button_list = document.querySelectorAll(".RD_textWrapper_5-109-0.RD_prevRadio_5-109-0")
-    var div = document.querySelector(".TB_body_5-109-0 > div")
-    var scrollAmount = 500
-    var scrollInterval = 500
-
     function scrollAndClick() {
+        var scrollAmount = 300
+        var scrollInterval = 500
+        var button_list = document.querySelectorAll(".RD_textWrapper_5-109-0.RD_prevRadio_5-109-0")
+        var div = document.querySelector(".TB_body_5-109-0 > div")
         button_list.forEach((element) => {
             if (element.innerText == "我不接受") {
                 element.click()
-                document.querySelector(".BTN_outerWrapper_5-109-0.BTN_danger_5-109-0.BTN_medium_5-109-0.BTN_outerWrapperBtn_5-109-0").click()
+                try{document.querySelector(".BTN_outerWrapper_5-109-0.BTN_danger_5-109-0.BTN_medium_5-109-0.BTN_outerWrapperBtn_5-109-0").click()}
+                catch(err){}
             }
         })
         div.scrollTop += scrollAmount
@@ -104,7 +104,7 @@ function check_num() {
     var text = document.querySelectorAll(".MDL_footer_5-109-0")
     for (var i = 0; i < text.length; i++) {
         if (text[i].innerText.includes("接受")) {
-            console.log(text[i].innerText);
+            console.log(text[i].innerText)
             var num = text[i].innerText.match(/\d+/)[0]
             if (num == 0) {
                 color = "YellowGreen"
