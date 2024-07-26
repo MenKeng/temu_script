@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         砍Temu999刀（一键拒绝降价）
 // @namespace    http://tampermonkey.net/
-// @version      3.3
+// @version      3.4
 // @description  Temu网页端一键拒绝所有降价，是兄弟就来砍我
 // @author       menkeng
 // @license      GPLv3
