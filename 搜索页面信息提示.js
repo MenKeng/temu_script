@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Temu显示店铺信息
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.21
 // @description  Temu搜索页面信息显示,商品ID,商家名称
 // @author       menkeng
 // @license      GPLv3
@@ -16,7 +16,7 @@
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 // this.$ = this.jQuery = jQuery.noConflict(true)
-console.log("Temu显示店铺信息已加载");
+console.log("Temu显示店铺信息已加载")
 var shop_count = {}
 var reg_shop_href = /https:\/\/www\.temu\.com\/.*-m-\d{15}.html/
 var reg_search_href = /https:\/\/www\.temu\.com\/search_result\.html\?search_key=/
@@ -40,10 +40,14 @@ function checkUrl() {
         shop_page()
     } else if (reg_search_href.test(url)) {
         console.log("搜索页面")
-        search_page()
+        setTimeout(() => {
+            search_page()
+        }, 2000)
     } else if (url.includes("category")) {
         console.log("分类页面")
-        search_page()
+        setTimeout(() => {
+            search_page()
+        }, 2000)
     }
 }
 
@@ -56,6 +60,21 @@ function shop_page() {
         var product_id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
         addData(shopData, shop_name, product_id)
     })
+    if (document.querySelectorAll(".splide__list").length > 1) {
+        var product_dom = document.querySelectorAll(".splide__list")
+        for (var i = 0; i < product_dom.length; i++) {
+            if (product_dom[i].children.length > 5) {
+                var product_list = product_dom[i].querySelectorAll(".splide__slide")
+            }
+        }
+        product_list.forEach(function (product) {
+            var id = product.querySelector("a").attributes.href.value
+            var reg_g = /\d{15}/g
+            id = id.match(reg_g)[0]
+            addData(shopData, shop_name, id)
+        })
+    }
+
     localStorage.setItem("shopData", JSON.stringify(shopData))
     console.log("已记录店铺数据")
 }
