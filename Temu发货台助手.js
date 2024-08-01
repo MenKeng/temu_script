@@ -8,7 +8,7 @@
 // @match        https://seller.kuajingmaihuo.com/main/order-manage
 // @match        https://seller.kuajingmaihuo.com/main/order-manager/shipping-desk
 // @match        https://seller.kuajingmaihuo.com/main/order-manager/shipping-list
-// @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // ==/UserScript==
 //脚本定制Q:605011383
