@@ -6,7 +6,6 @@
 // @author       menkeng
 // @license      GPLv3
 // @match        https://seller.kuajingmaihuo.com/main/order-manage
-// @require      file://C:/Users/Administrator/Desktop/code/greasy/temu_script/Temu一键加入发货台.js
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // @grant        GM_registerMenuCommand
@@ -15,13 +14,12 @@
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
-// this.$ = this.jQuery = jQuery.noConflict(true)
 var shipping_desk_flag = false
 var shipping_desk_interval
 
 setTimeout(() => {
     var button_box = tool.createButtonBox(0, 0)
-    tool.createButton("加入发货台", select_shipping_desk, button_box)
+    tool.createButton("加入发货台", select_shipping_desk_ready, button_box)
 }, 2000)
 
 function toggle_shipping_desk() {
@@ -39,7 +37,7 @@ function toggle_shipping_desk() {
 
 function shipping_desk() {
     var list = $("div.CBX_active_5-113-0")
-    console.log(list.length);
+    console.log(list.length)
     for (var i = 0; i < list.length; i++) {
         var span = $(list[i]).closest("tr").find("span:contains('加入发货台')")
         if (span.length > 0) {
@@ -52,18 +50,31 @@ function shipping_desk() {
     }
 }
 
-function select_shipping_desk() {
+function select_shipping_desk_ready() {
     var list = $(".CBX_squareInputWrapper_5-113-0")
     $(list).eq(1).click()
     var ship_list = $("tr:not(.TB_trDisabled_5-113-0)")
     console.log(ship_list.length)
     if (ship_list.length > 2) {
-        console.log("ship_list.length > 2");
+        console.log("ship_list.length > 2")
         for (var i = 3; i < ship_list.length; i++) {
-            console.log ($(ship_list) .eq(i - 1));
+            console.log($(ship_list).eq(i - 1))
             $(ship_list)
                 .eq(i - 1)
                 .click()
+        }
+    }
+}
+function select_shipping_desk_shipped() {
+    var list = $("tbody tr")
+    var address = $(list).eq(0).find("span:contains('收货仓库：')").next().text()
+    $(list).eq(0).find(".CBX_groupDisabled_5-113-0").click()
+    // console.log("address", address)
+    for (var i = 1; i < list.length; i++) {
+        var address_Now = $(list).eq(i).find("span:contains('收货仓库：')").next().text()
+        // console.log(address_Now)
+        if (address == address_Now) {
+            $(list).eq(i).find(".CBX_groupDisabled_5-113-0").click()
         }
     }
 }

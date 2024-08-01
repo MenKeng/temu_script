@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         砍Temu999刀（一键拒绝降价）
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.9
 // @description  Temu网页端一键拒绝所有降价，是兄弟就来砍我
 // @author       menkeng
 // @license      GPLv3
 // @match        https://kuajing.pinduoduo.com/*
 // @match        https://seller.kuajingmaihuo.com/*
 // ==/UserScript==
+//脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
@@ -20,11 +21,11 @@ function check_price_cut() {
     var check_price_time = 0
     check_price_interval = setInterval(() => {
         check_price_time++
-        var flexs = document.querySelectorAll("div.MDL_header_5-109-0")
+        var flexs = document.querySelectorAll("div.MDL_header_5-111-0")
         flexs.forEach(function (pop) {
             if (pop.innerText == "商品降价提醒") {
                 pop = pop.nextElementSibling
-                console.log("捕捉到降价提醒")
+                console.log("捕捉到降价1")
                 if (check_price_time > 10) {
                     clearInterval(check_price_interval)
                 }
@@ -33,9 +34,10 @@ function check_price_cut() {
                 create_button()
             }
         })
-        var flex_2 = document.querySelectorAll("div.MDL_innerWrapper_5-109-0")
+        var flex_2 = document.querySelectorAll("div.MDL_innerWrapper_5-111-0")
         flex_2.forEach(function (pop) {
             if (pop.innerText.includes("降价")) {
+                console.log("捕捉到降价2")
                 clearInterval(check_price_interval)
                 create_button()
             }
@@ -50,33 +52,44 @@ setTimeout(() => {
 }, 2000)
 
 function price_cut() {
-    function scrollAndClick() {
-        var scrollAmount = 300
-        var scrollInterval = 500
-        var button_list = document.querySelectorAll(".RD_textWrapper_5-109-0.RD_prevRadio_5-109-0")
-        var div = document.querySelector(".TB_body_5-109-0 > div")
-        button_list.forEach((element) => {
-            if (element.innerText == "我不接受") {
-                element.click()
-                try{document.querySelector(".BTN_outerWrapper_5-109-0.BTN_danger_5-109-0.BTN_medium_5-109-0.BTN_outerWrapperBtn_5-109-0").click()}
-                catch(err){}
-            }
-        })
-        div.scrollTop += scrollAmount
-        var scrollEvent = new CustomEvent("scroll")
-        div.dispatchEvent(scrollEvent)
-        if (div.scrollTop + div.clientHeight < div.scrollHeight) {
-            setTimeout(scrollAndClick, scrollInterval)
-        } else {
-            scrollAndClick()
-            var button = document.getElementById("拒绝降价")
-            if (button) {
-                button.remove()
-            }
-            check_num()
-        }
+    document.querySelectorAll(".MDL_innerWrapper_5-111-0 tbody tr").forEach((element) => {
+        element.querySelector("label:last-child").click()
+        document.querySelector(".PT_outerWrapper_5-111-0 button").click()
+    })
+    var div = document.querySelector(".TB_body_5-111-0")
+    if (div && ('scrollTop' in div)) {
+        scrollAndClick(div)
     }
-    scrollAndClick()
+}
+function scrollAndClick(dom) {
+    var scrollAmount = 300
+    var scrollInterval = 500
+    var button_list = document.querySelectorAll(".RD_textWrapper_5-111-0.RD_prevRadio_5-111-0")
+    var div = dom
+    button_list.forEach((element) => {
+        if (element.innerText == "我不接受") {
+            element.click()
+            try {
+                document.querySelector(".BTN_outerWrapper_5-111-0.BTN_danger_5-111-0.BTN_medium_5-111-0.BTN_outerWrapperBtn_5-111-0").click()
+            } catch (err) {}
+        }
+    })
+    if (!div || !('scrollTop' in div)) {
+        return;
+    }
+    div.scrollTop += scrollAmount
+    var scrollEvent = new CustomEvent("scroll")
+    div.dispatchEvent(scrollEvent)
+    if (div.scrollTop + div.clientHeight < div.scrollHeight) {
+        setTimeout(scrollAndClick, scrollInterval)
+    } else {
+        scrollAndClick()
+        var button = document.getElementById("拒绝降价")
+        if (button) {
+            button.remove()
+        }
+        check_num()
+    }
 }
 function create_button() {
     var reject_btn = document.createElement("div")

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Temu显示店铺信息
 // @namespace    http://tampermonkey.net/
-// @version      0.21
+// @version      0.3
 // @description  Temu搜索页面信息显示,商品ID,商家名称
 // @author       menkeng
 // @license      GPLv3
@@ -11,14 +11,14 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
-// @require      https://unpkg.com/dexie/dist/dexie.js
+//脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 // this.$ = this.jQuery = jQuery.noConflict(true)
 console.log("Temu显示店铺信息已加载")
 var shop_count = {}
-var reg_shop_href = /https:\/\/www\.temu\.com\/.*-m-\d{15}.html/
+var reg_shop_href = /www.temu.com\/.*-m-\d{13}/
 var reg_search_href = /https:\/\/www\.temu\.com\/search_result\.html\?search_key=/
 // 监听 popstate 事件
 window.addEventListener("popstate", function (event) {
@@ -52,6 +52,7 @@ function checkUrl() {
 }
 
 function shop_page() {
+    var product_list_inner
     var shopData = localStorage_getStorage("shopData")
     var product_list = document.querySelectorAll("._3wENoqiV .EKDT7a3v")
     var shop_name = document.querySelector("h1").innerText
@@ -61,13 +62,14 @@ function shop_page() {
         addData(shopData, shop_name, product_id)
     })
     if (document.querySelectorAll(".splide__list").length > 1) {
+        console.log("有多个商品列表")
         var product_dom = document.querySelectorAll(".splide__list")
         for (var i = 0; i < product_dom.length; i++) {
             if (product_dom[i].children.length > 5) {
-                var product_list = product_dom[i].querySelectorAll(".splide__slide")
+                product_list_inner = product_dom[i].querySelectorAll(".splide__slide")
             }
         }
-        product_list.forEach(function (product) {
+        product_list_inner.forEach(function (product) {
             var id = product.querySelector("a").attributes.href.value
             var reg_g = /\d{15}/g
             id = id.match(reg_g)[0]
@@ -108,20 +110,21 @@ async function search_page() {
     })
 }
 function updateShopCountDisplay(shop_count) {
-    var shopCountContainer = document.querySelector(".shop-count-container")
+    var shopCountContainer = document.querySelector(".shop-count-container");
     if (!shopCountContainer) {
-        shopCountContainer = document.createElement("div")
-        shopCountContainer.classList.add("shop-count-container")
-        shopCountContainer.style.cssText = "position: fixed; top: 0; right: 0; background-color: white; padding: 10px; z-index: 100000;"
-        document.body.appendChild(shopCountContainer)
+        shopCountContainer = document.createElement("div");
+        shopCountContainer.classList.add("shop-count-container");
+        shopCountContainer.style.cssText = "position: fixed; top: 0; right: 0; background-color: white; padding: 10px; z-index: 100000;";
+        document.body.appendChild(shopCountContainer);
     }
-    shopCountContainer.innerHTML = ""
-
-    for (var shop_name in shop_count) {
-        var shopCountElement = document.createElement("div")
-        shopCountElement.innerText = `${shop_name}: ${shop_count[shop_name]}`
-        shopCountContainer.appendChild(shopCountElement)
-    }
+    shopCountContainer.innerHTML = "";
+    var shopArray = Object.entries(shop_count);
+    shopArray.sort((a, b) => b[1] - a[1]);
+    shopArray.forEach(([shop_name, count]) => {
+        var shopCountElement = document.createElement("div");
+        shopCountElement.innerText = `${shop_name}: ${count}`;
+        shopCountContainer.appendChild(shopCountElement);
+    });
 }
 // ---------------------------------------------------工具类---------------------------------------------------
 function sleep(ms) {
@@ -162,10 +165,5 @@ function addData(storage, key, value) {
 }
 // upgrade
 // 自动记录搜索关键字
-
-// 店铺计数排序
 // 销量统计(合并)
-// 手动清空数据按钮
 // (可选店铺清空数据按钮)
-
-// 预计增加价格变化曲线
