@@ -17,21 +17,54 @@
 //脚本定制Q:605011383
 // this.$ = this.jQuery = jQuery.noConflict(true)
 var shipping_desk_flag = false
+var shipping_desk_interval
+
 setTimeout(() => {
     var button_box = tool.createButtonBox(0, 0)
-tool.createButton("加入发货台", toggle_shipping_desk, button_box)
-}, 2000);
+    tool.createButton("加入发货台", select_shipping_desk, button_box)
+}, 2000)
+
 function toggle_shipping_desk() {
-    if (shipping_desk_flag == ture){
-        shipping_desk()
+    var toggle = document.querySelector("#加入发货台")
+    if (toggle.innerText == "加入发货台") {
+        shipping_desk_flag = true
+        toggle.innerText = "停止加入"
+        shipping_desk_interval = setInterval(shipping_desk, 500)
+    } else if (toggle.innerText == "停止加入") {
+        shipping_desk_flag = false
+        toggle.innerText = "加入发货台"
+        clearInterval(shipping_desk_interval)
     }
 }
 
 function shipping_desk() {
     var list = $("div.CBX_active_5-113-0")
+    console.log(list.length);
     for (var i = 0; i < list.length; i++) {
-       $(list[i]).closest("tr").find("span:contains('加入发货台')").click()
-       $("div[class^='PP_popoverContent']").find("button:contains('确认')").click()
+        var span = $(list[i]).closest("tr").find("span:contains('加入发货台')")
+        if (span.length > 0) {
+            span.click()
+            var confirmButton = $("div[class^='PP_popoverContent']").find("button:contains('确认')")
+            if (confirmButton.length > 0) {
+                confirmButton.click()
+            }
+        }
+    }
+}
+
+function select_shipping_desk() {
+    var list = $(".CBX_squareInputWrapper_5-113-0")
+    $(list).eq(1).click()
+    var ship_list = $("tr:not(.TB_trDisabled_5-113-0)")
+    console.log(ship_list.length)
+    if (ship_list.length > 2) {
+        console.log("ship_list.length > 2");
+        for (var i = 3; i < ship_list.length; i++) {
+            console.log ($(ship_list) .eq(i - 1));
+            $(ship_list)
+                .eq(i - 1)
+                .click()
+        }
     }
 }
 class tool {
@@ -162,13 +195,11 @@ class tool {
         document.body.appendChild(textarea)
         textarea.select()
         try {
-
             document.execCommand("copy")
             console.log("复制成功")
         } catch (err) {
             console.error("复制失败: ", err)
         } finally {
-
             document.body.removeChild(textarea)
         }
     }
