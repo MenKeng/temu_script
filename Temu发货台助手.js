@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Temu发货台助手
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  一键加入发货台,备货单,备货单发货
+// @version      0.3
+// @description  一键加入发货台,备货单,备货单发货,跳过发货教程
 // @author       menkeng
 // @license      GPLv3
 // @match        https://seller.kuajingmaihuo.com/main/order-manage
@@ -30,26 +30,35 @@ window.onload = function () {
 }
 
 function checkUrl() {
-    var button_box = tool.createButtonBox(80, 100)
+    var button_box = tool.createButtonBox(10, 180)
     var url = window.location.href
+    clearTimeout(cleartimer)
+    tool.removeButtons()
     if (url.match(备货单)) {
-        console.log("备货单")
+        console.log("备货单页面")
         tool.createButton("开始抢发货台", toggle_get_ship, button_box)
+        setTimeout(() => {
+            skip_guide()
+        }, 2000)
     } else if (url.match(发货台)) {
-        console.log("发货台")
+        console.log("发货台页面")
         tool.createButton("发货", query_shipnum, button_box)
     } else if (url.match(发货单列表)) {
-        console.log("发货单列表")
+        console.log("发货单列表页面")
         tool.createButton("发货", query_shipnum, button_box)
     }
+    var cleartimer = setTimeout(() => {
+        clearInterval(get_shipping_interval)
+    }, 5 * 60 *1000);
 }
 var isGettingShipping = false
 var get_shipping_interval
+var cleartimer
 function toggle_get_ship() {
     isGettingShipping = !isGettingShipping
-    var text = isGettingShipping ? "开始抢发货台" : "停止抢发货台"
+    var text = isGettingShipping ? "开始抢发货台" : "正在抢...点击停止"
 
-    document.querySelector("#开始/停止抢发货台").innerText = text
+    document.querySelector("#开始抢发货台").innerText = text
 
     if (isGettingShipping) {
         get_shipping()
@@ -75,30 +84,51 @@ function get_shipping() {
             })
             return
         }
-        $("#root")
-            .find("a")
-            .each(function () {
-                let link = $(this),
-                    text = link.text()
-                if (text === "加入发货台") {
+        $("tbody a:contains('加入发货台')").each(function () {
+            $(this).click()
+            var button = $(this)
+            var disabled = button.is("[disabled]")
+            if (!disabled) {
+                simulateMouseClick($(this).get(0)).then(function () {
                     let buttons = $('div[data-testid="beast-core-portal-main"]').find("button")
-                    if (!link.is("[disabled]")) {
-                        console.log("点击2")
-                        simulateMouseClick(link.get(0)).then(function () {
-                            buttons.each(function () {
-                                simulateMouseClick($(this).get(0)).then(function () {})
-                            })
-                        })
-                    } else if (buttons.length > 0) {
-                        buttons.each(function () {
-                            simulateMouseClick($(this).get(0)).then(function () {})
-                        })
-                    }
-                }
-            })
+                    simulateMouseClick(buttons.get(0))
+                })
+            }
+            console.log(button)
+            // console.log(this)
+
+        })
+        // $("tbody").find("a").each(function () {
+        //         let link = $(this),
+        //             text = link.text()
+        //         if (text === "加入发货台") {
+        //             let buttons = $('div[data-testid="beast-core-portal-main"]').find("button")
+        //             if (!link.is("[disabled]")) {
+        //                 console.log("点击2")
+        //                 simulateMouseClick(link.get(0)).then(function () {
+        //                     buttons.each(function () {
+        //                         simulateMouseClick($(this).get(0)).then(function () {})
+        //                     })
+        //                 })
+        //             } else if (buttons.length > 0) {
+        //                 buttons.each(function () {
+        //                     simulateMouseClick($(this).get(0)).then(function () {})
+        //                 })
+        //             }
+        //         }
+        //     })
     }, 1000)
 }
-
+function skip_guide() {
+    var guide_dom = $(".guide-steps_box__2jPgE")
+    if (guide_dom !== null) {
+        $(guide_dom).find("span:contains('下一步')").click()
+        $(guide_dom).find("span:contains('下一步，打印商品打包标签')").click()
+        $(guide_dom).find("span:contains('下一步，去发货')").click()
+        $(guide_dom).find("span:contains('发货完成，查看物流信息')").click()
+        $(guide_dom).find("span:contains('完成')").click()
+    }
+}
 class tool {
     static createButtonBox(top, left) {
         var existingBox = document.getElementById("js_buttonbox")
@@ -119,7 +149,7 @@ class tool {
         button.textContent = text
         button.id = text
         button.classList.add("js_fixed-button")
-        button.style.cssText = "background-color: rgba(255, 255, 255, 0.2); color: white; padding: 10px 15px; border: none; cursor: pointer;"
+        button.style.cssText = "background-color: rgba(255, 255, 255, 0.2); color: black; padding: 10px 15px; border: none; cursor: pointer;"
         button.addEventListener("click", executeFunction)
         box.appendChild(button)
     }
