@@ -70,15 +70,15 @@ function get_shipping() {
     get_shipping_interval = setInterval(() => {
         if (!isGettingShipping) {
             clearInterval(get_shipping_interval)
-            const masks = document.querySelectorAll(".MDL_mask_5-113-0")
+            const masks = document.querySelectorAll(".MDL_mask_5-111-0")
             masks.forEach((mask) => {
                 mask.remove()
             })
-            const masks2 = document.querySelectorAll(".MDL_alert_5-113-0")
+            const masks2 = document.querySelectorAll(".MDL_alert_5-111-0")
             masks2.forEach((mask) => {
                 mask.remove()
             })
-            const masks3 = document.querySelectorAll(".MDL_withLogo_5-113-0")
+            const masks3 = document.querySelectorAll(".MDL_withLogo_5-111-0")
             masks3.forEach((mask) => {
                 mask.remove()
             })
@@ -89,34 +89,12 @@ function get_shipping() {
             var button = $(this)
             var disabled = button.is("[disabled]")
             if (!disabled) {
-                simulateMouseClick($(this).get(0)).then(function () {
+                tool.simulateMouseClick($(this).get(0)).then(function () {
                     let buttons = $('div[data-testid="beast-core-portal-main"]').find("button")
-                    simulateMouseClick(buttons.get(0))
+                    tool.simulateMouseClick(buttons.get(0))
                 })
             }
-            console.log(button)
-            // console.log(this)
-
         })
-        // $("tbody").find("a").each(function () {
-        //         let link = $(this),
-        //             text = link.text()
-        //         if (text === "加入发货台") {
-        //             let buttons = $('div[data-testid="beast-core-portal-main"]').find("button")
-        //             if (!link.is("[disabled]")) {
-        //                 console.log("点击2")
-        //                 simulateMouseClick(link.get(0)).then(function () {
-        //                     buttons.each(function () {
-        //                         simulateMouseClick($(this).get(0)).then(function () {})
-        //                     })
-        //                 })
-        //             } else if (buttons.length > 0) {
-        //                 buttons.each(function () {
-        //                     simulateMouseClick($(this).get(0)).then(function () {})
-        //                 })
-        //             }
-        //         }
-        //     })
     }, 1000)
 }
 function skip_guide() {
