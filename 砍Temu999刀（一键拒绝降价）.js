@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         砍Temu999刀（一键拒绝降价）
 // @namespace    http://tampermonkey.net/
-// @version      3.9
+// @version      3.5
 // @description  Temu网页端一键拒绝所有降价，是兄弟就来砍我
 // @author       menkeng
 // @license      GPLv3
@@ -10,8 +10,7 @@
 // ==/UserScript==
 //脚本定制Q:605011383
 //脚本定制Q:605011383
-//脚本定制Q:605011383
-//脚本定制Q:605011383
+console.log("砍Temu999刀（一键拒绝降价）已加载");
 var check_price_flag = false
 var check_price_interval
 window.onload = function () {
@@ -114,7 +113,7 @@ function create_button() {
 
 function check_num() {
     var color
-    var text = document.querySelectorAll(".MDL_footer_5-109-0")
+    var text = document.querySelectorAll(".MDL_footer_5-111-0")
     for (var i = 0; i < text.length; i++) {
         if (text[i].innerText.includes("接受")) {
             console.log(text[i].innerText)
