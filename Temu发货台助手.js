@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Temu发货台助手
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.30
 // @description  一键加入发货台,备货单,备货单发货,跳过发货教程
 // @author       menkeng
 // @license      GPLv3
@@ -11,6 +11,7 @@
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // ==/UserScript==
+//脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
@@ -56,15 +57,9 @@ var get_shipping_interval
 var cleartimer
 function toggle_get_ship() {
     isGettingShipping = !isGettingShipping
-    var text = isGettingShipping ? "开始抢发货台" : "正在抢...点击停止"
-
+    var text = isGettingShipping ? "正在抢...点击停止" : "开始抢发货台"
     document.querySelector("#开始抢发货台").innerText = text
-
-    if (isGettingShipping) {
         get_shipping()
-    } else {
-        clearInterval(get_shipping_interval)
-    }
 }
 function get_shipping() {
     get_shipping_interval = setInterval(() => {
@@ -95,6 +90,12 @@ function get_shipping() {
                 })
             }
         })
+        const masks = document.querySelectorAll(".MDL_mask_5-111-0")
+        masks.forEach((mask) => {
+            mask.remove()
+        })
+        let time = document.querySelectorAll(".MDL_alert_5-111-0").length
+        tool.showPopup("已抢" + time + "次")
     }, 1000)
 }
 function skip_guide() {
@@ -202,8 +203,11 @@ class tool {
             document.body.removeChild(textarea)
         }
     }
-    static showPopup(message, duration = 5000, color = "red") {
+    static showPopup(message, duration = 2000, color = "pink") {
+        if (document.getElementById("js_popup")) {
+        }
         const popup = document.createElement("div")
+        popup.id = "js_popup"
         popup.style.cssText = `position: fixed; top: 50%; left: 50%; color: white; font-size: 16px; font-weight: bold; text-align: center; transform: translate(-50%, -50%); background-color: ${color}; padding: 20px; z-index: 99999;`
         popup.textContent = message
         document.body.appendChild(popup)
