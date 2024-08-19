@@ -61,7 +61,7 @@ function shop_page() {
         addData(shopData, shop_name, product_id)
     })
     if (document.querySelectorAll(".splide__list").length > 1) {
-        console.log("有排行榜")
+        console.log("排行榜")
         var product_dom = document.querySelectorAll(".splide__list")
         for (var i = 0; i < product_dom.length; i++) {
             if (product_dom[i].children.length > 5) {
@@ -81,7 +81,7 @@ function shop_page() {
 }
 async function search_page() {
     var item_count = 0
-    var product_list = document.querySelectorAll("._3wENoqiV .EKDT7a3v")
+    var product_list = document.querySelectorAll(".EKDT7a3v")
     var shop_data = localStorage_getStorage("shopData")
     product_list.forEach(async (product) => {
         item_count++
