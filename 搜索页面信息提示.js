@@ -54,15 +54,14 @@ function checkUrl() {
 function shop_page() {
     var product_list_inner
     var shopData = localStorage_getStorage("shopData")
-    var product_list = document.querySelectorAll("._3wENoqiV .EKDT7a3v")
+    var product_list = document.querySelectorAll("._3wENoqiV .goods-image-container-external")
     var shop_name = document.querySelector("h1").innerText
     product_list.forEach(async (product) => {
-        var id_dom = product.querySelectorAll("div")[1]
-        var product_id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
+        var product_id = product.getAttribute("data-tooltip").match(/\d+/)[0]
         addData(shopData, shop_name, product_id)
     })
     if (document.querySelectorAll(".splide__list").length > 1) {
-        console.log("有多个商品列表")
+        console.log("有排行榜")
         var product_dom = document.querySelectorAll(".splide__list")
         for (var i = 0; i < product_dom.length; i++) {
             if (product_dom[i].children.length > 5) {
@@ -82,7 +81,7 @@ function shop_page() {
 }
 async function search_page() {
     var item_count = 0
-    var product_list = document.querySelectorAll(".EKDT7a3v")
+    var product_list = document.querySelectorAll("._3wENoqiV .EKDT7a3v")
     var shop_data = localStorage_getStorage("shopData")
     product_list.forEach(async (product) => {
         item_count++
@@ -90,6 +89,7 @@ async function search_page() {
             await sleep(item_count * 10)
         }
         var id_dom = product.querySelectorAll("div")[1]
+        console.log(id_dom)
         var id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
         var shop_name = findKeyByName(shop_data, id)
         if (!shop_count[shop_name]) {
