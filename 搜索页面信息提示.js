@@ -52,6 +52,8 @@ function checkUrl() {
 }
 
 function shop_page() {
+    var more = $("span:contains('See more')")
+    more.length > 1 ? more[0].click() : null
     var product_list_inner
     var shopData = localStorage_getStorage("shopData")
     var product_list = document.querySelectorAll("._3wENoqiV .goods-image-container-external")
@@ -110,21 +112,21 @@ async function search_page() {
     })
 }
 function updateShopCountDisplay(shop_count) {
-    var shopCountContainer = document.querySelector(".shop-count-container");
+    var shopCountContainer = document.querySelector(".shop-count-container")
     if (!shopCountContainer) {
-        shopCountContainer = document.createElement("div");
-        shopCountContainer.classList.add("shop-count-container");
-        shopCountContainer.style.cssText = "position: fixed; top: 0; right: 0; background-color: white; padding: 10px; z-index: 100000;";
-        document.body.appendChild(shopCountContainer);
+        shopCountContainer = document.createElement("div")
+        shopCountContainer.classList.add("shop-count-container")
+        shopCountContainer.style.cssText = "position: fixed; top: 0; right: 0; background-color: white; padding: 10px; z-index: 100000;"
+        document.body.appendChild(shopCountContainer)
     }
-    shopCountContainer.innerHTML = "";
-    var shopArray = Object.entries(shop_count);
-    shopArray.sort((a, b) => b[1] - a[1]);
+    shopCountContainer.innerHTML = ""
+    var shopArray = Object.entries(shop_count)
+    shopArray.sort((a, b) => b[1] - a[1])
     shopArray.forEach(([shop_name, count]) => {
-        var shopCountElement = document.createElement("div");
-        shopCountElement.innerText = `${shop_name}: ${count}`;
-        shopCountContainer.appendChild(shopCountElement);
-    });
+        var shopCountElement = document.createElement("div")
+        shopCountElement.innerText = `${shop_name}: ${count}`
+        shopCountContainer.appendChild(shopCountElement)
+    })
 }
 // ---------------------------------------------------工具类---------------------------------------------------
 function sleep(ms) {
