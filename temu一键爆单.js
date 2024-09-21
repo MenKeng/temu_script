@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Temu一键爆单（仅限娱乐）
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  安装脚本即可爆单，仅限娱乐，严禁用于任何商业盈利或非法用途。使用本脚本产生的任何后果，均由用户自行承担，与脚本提供者无关。
 // @author       menkeng
 // @license      GPLv3
@@ -11,6 +11,7 @@
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
+//脚本定制Q:605011383   
 const img_html =
     '<img class="sales-block_goImg__yXSfd" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAgCAYAAAASYli2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA2ElEQVR4nOXVuwrCQBCF4anFQkRRxEi8EjRqCgsL9UXEe/T9H8EZYrHMWs2ZLoEfUn1s2MkuUe2fBnfkTlzTAzxwn19nroWC6wCULlwbRcNVSjeui6J7hd65PoruFPrkBii6VeiLG6HoSqElN0bRjHsHqLzPUFSAUqEZiqYKlXIUTajanBAtUFTG56HQDgIOqZpLF1DmUH/yxopNKN6UpRWbUzyLCyumB1tWObViOcW/XmrFCoXJziZWTB9fMnfm4+vfAduzYvoKuBIwtO6XlPs16n7R1+D5AnpdLQToPUXkAAAAAElFTkSuQmCC">'
 function generateRandomArray() {
@@ -66,7 +67,12 @@ function generateRandomArray() {
 
 let data = generateRandomArray()
 window.addEventListener("load", function () {
-    change()
+    let Interval = setInterval(() => {
+        change()
+    }, 100);
+    setTimeout(() => {
+        clearInterval(Interval)
+    }, 5000);
 })
 
 function change() {
