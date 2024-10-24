@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Temu发货台助手
 // @namespace    http://tampermonkey.net/
-// @version      0.30
+// @version      0.40
 // @description  一键加入发货台,备货单,备货单发货,跳过发货教程
 // @author       menkeng
 // @license      GPLv3
@@ -9,9 +9,9 @@
 // @match        https://seller.kuajingmaihuo.com/main/order-manager/shipping-desk
 // @match        https://seller.kuajingmaihuo.com/main/order-manager/shipping-list
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
+// @require      file://d:/Lenovo/Documents/code/greasy/temu_script/Temu发货台助手.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // ==/UserScript==
-//脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
 //脚本定制Q:605011383
@@ -31,26 +31,27 @@ window.onload = function () {
 }
 
 function checkUrl() {
-    var button_box = tool.createButtonBox(10, 180)
+    var button_box = tool.createButtonBox(10, 200)
     var url = window.location.href
     clearTimeout(cleartimer)
     tool.removeButtons()
-    if (url.match(备货单)) {
+    if (url == 备货单) {
         console.log("备货单页面")
         tool.createButton("开始抢发货台", toggle_get_ship, button_box)
         setTimeout(() => {
             skip_guide()
         }, 2000)
-    } else if (url.match(发货台)) {
+        return
+    } else if (url == 发货台) {
         console.log("发货台页面")
-        tool.createButton("发货", query_shipnum, button_box)
-    } else if (url.match(发货单列表)) {
+        tool.createButton("最大数量", shipping_addnum, button_box)
+    } else if (url == 发货单列表) {
         console.log("发货单列表页面")
         tool.createButton("发货", query_shipnum, button_box)
     }
     var cleartimer = setTimeout(() => {
         clearInterval(get_shipping_interval)
-    }, 5 * 60 *1000);
+    }, 5 * 60 * 1000)
 }
 var isGettingShipping = false
 var get_shipping_interval
@@ -59,7 +60,7 @@ function toggle_get_ship() {
     isGettingShipping = !isGettingShipping
     var text = isGettingShipping ? "正在抢...点击停止" : "开始抢发货台"
     document.querySelector("#开始抢发货台").innerText = text
-        get_shipping()
+    get_shipping()
 }
 function get_shipping() {
     get_shipping_interval = setInterval(() => {
@@ -108,6 +109,36 @@ function skip_guide() {
         $(guide_dom).find("span:contains('完成')").click()
     }
 }
+function shipping_addnum() {
+    var stockName_Now
+    var list = $("tbody tr")
+    var stockName = $(list[0]).find("td:nth-child(3)").text()
+    for (var i = 0; i < list.length; i++) {
+        var stock_ele_length = $(list[i]).children().length
+        if (stock_ele_length !== 4) {
+            stockName_Now = $(list[i]).find("td:nth-child(3)").text()
+        }
+        if (stockName_Now == stockName) {
+            $(list[i]).find("span:contains('修改')").click()
+            setTimeout(() => {
+                shipping_addnum_add()
+            }, 500 * i)
+        }
+    }
+}
+function shipping_addnum_add() {
+    var input = $("div.PP_popoverTitle_5-111-0:contains('实际发货数（件）')").parent().find(".IPT_reunitBlock_5-111-0 input")
+    if (input.length > 0) {
+        var max = input.attr("max")
+        tool.changeReactInputValue(input[0], max)
+        $("span:contains('确认')").click()
+        setTimeout(() => {
+            shipping_addnum_add()
+        }, 200)
+    } else {
+        return
+    }
+}
 class tool {
     static createButtonBox(top, left) {
         var existingBox = document.getElementById("js_buttonbox")
@@ -121,18 +152,16 @@ class tool {
         document.body.appendChild(box)
         return box
     }
-
     static createButton(text, executeFunction, box) {
         var button = document.createElement("button")
         button.classList.add("fixed-button")
         button.textContent = text
         button.id = text
         button.classList.add("js_fixed-button")
-        button.style.cssText = "background-color: rgba(255, 255, 255, 0.2); color: black; padding: 10px 15px; border: none; cursor: pointer;"
+        button.style.cssText = "background-color: rgba(251, 119, 1, 0.5); color: white; padding: 8px 10px; border: none; cursor: pointer;border-radius: 5px;"
         button.addEventListener("click", executeFunction)
         box.appendChild(button)
     }
-
     static fn_dispatchEvent(element, eventType) {
         const event = new MouseEvent(eventType, {
             view: document.defaultView,
@@ -141,7 +170,6 @@ class tool {
         })
         element.dispatchEvent(event)
     }
-
     static removeButtons() {
         var buttons = document.querySelectorAll(".js_fixed-button")
         buttons.forEach(function (button) {
@@ -150,13 +178,11 @@ class tool {
     }
     static setReactValue_textarea(el, value) {
         const previousValue = el.value
-
         if (el.type === "checkbox" || el.type === "radio") {
             if ((!!value && !el.checked) || (!!!value && el.checked)) {
                 el.click()
             }
         } else el.value = value
-
         const tracker = el._valueTracker
         if (tracker) {
             tracker.setValue(previousValue)
@@ -215,8 +241,10 @@ class tool {
             document.body.removeChild(popup)
         }, duration)
     }
+    static sleep (ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
 }
 
 // upgrade
-// 发货台改最大数量
 // 发货单自动改重量

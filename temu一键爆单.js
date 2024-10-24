@@ -94,10 +94,10 @@ function change() {
             if (i == 5) {
                 temp = 1
             }
-            console.log(data[(i - temp) * 2 + 20])
+            // console.log(data[(i - temp) * 2 + 20])
             data_board2[i].innerText = data[i * 2 + 21]
         }
-        let name = document.querySelector(".elli_outerWrapper_5-111-0.elli_limitWidth_5-111-0")
+        let name = document.querySelector(".elli_outerWrapper_5-114-0.elli_limitWidth_5-114-0")
         if (name !== null) {
             name.innerText = "\u5b9a\u5236qq\uff1a605011383";
         }
