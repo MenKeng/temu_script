@@ -8,6 +8,7 @@
 // @match        https://www.temu.com/search_result.html*
 // @match        https://www.temu.com/*-m-*
 // @match        https://www.temu.com/*page_name=category*
+// @match        https://www.temu.com/search_result.html?search_key*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
@@ -55,12 +56,12 @@ function shop_page() {
     var more = $("span:contains('See more')")
     more.length > 1 ? more[0].click() : null
     var product_list_inner
-    var shopData = localStorage_getStorage("shopData")
+    var shopData = tool.localStorage_getStorage("shopData")
     var product_list = document.querySelectorAll("._3wENoqiV .goods-image-container-external")
     var shop_name = document.querySelector("h1").innerText
     product_list.forEach(async (product) => {
         var product_id = product.getAttribute("data-tooltip").match(/\d+/)[0]
-        addData(shopData, shop_name, product_id)
+        tool.addData(shopData, shop_name, product_id)
     })
     if (document.querySelectorAll(".splide__list").length > 1) {
         console.log("排行榜")
@@ -74,7 +75,7 @@ function shop_page() {
             var id = product.querySelector("a").attributes.href.value
             var reg_g = /\d{15}/g
             id = id.match(reg_g)[0]
-            addData(shopData, shop_name, id)
+            tool.addData(shopData, shop_name, id)
         })
     }
 
@@ -84,16 +85,16 @@ function shop_page() {
 async function search_page() {
     var item_count = 0
     var product_list = document.querySelectorAll(".EKDT7a3v")
-    var shop_data = localStorage_getStorage("shopData")
+    var shop_data = tool.localStorage_getStorage("shopData")
     product_list.forEach(async (product) => {
         item_count++
         if (item_count > 12) {
-            await sleep(item_count * 10)
+            await tool.sleep(item_count * 10)
         }
         var id_dom = product.querySelectorAll("div")[1]
-        console.log(id_dom)
+        // console.log(id_dom)
         var id = id_dom.getAttribute("data-tooltip").match(/\d+/)[0]
-        var shop_name = findKeyByName(shop_data, id)
+        var shop_name = tool.findKeyByName(shop_data, id)
         if (!shop_count[shop_name]) {
             shop_count[shop_name] = 0
         }
@@ -107,7 +108,12 @@ async function search_page() {
         button.style.cssText = "padding: 10px 15px; border: none; cursor: pointer;z-index: 99999;color:black"
         button.onclick = function () {
             event.stopPropagation()
+            // 复制id到粘贴板
+            navigator.clipboard.writeText(id)
+            tool.copy(id)
         }
+        // 设置button 的alt信息
+        button.setAttribute("alt", "点击复制商品id")
         id_dom.appendChild(button)
     })
 }
@@ -128,43 +134,65 @@ function updateShopCountDisplay(shop_count) {
         shopCountContainer.appendChild(shopCountElement)
     })
 }
+function cleardata_by_shopname(shop_name) {
+    var shopData = tool.localStorage_getStorage("shopData")
+    delete shopData[shop_name]
+    localStorage.setItem("shopData", JSON.stringify(shopData))
+}
 // ---------------------------------------------------工具类---------------------------------------------------
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-function localStorage_getStorage(name) {
-    var data = localStorage.getItem(name)
-    return data ? JSON.parse(data) : {}
-}
-// 创建反向映射
-function createReverseMap(data) {
-    const reverseMap = new Map()
-    for (let key in data) {
-        if (data.hasOwnProperty(key)) {
-            data[key].forEach((item) => {
-                reverseMap.set(item, key)
-            })
+class tool {
+    static sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+    static localStorage_getStorage(name) {
+        var data = localStorage.getItem(name)
+        return data ? JSON.parse(data) : {}
+    }
+    // 创建反向映射
+    static createReverseMap(data) {
+        const reverseMap = new Map()
+        for (let key in data) {
+            if (data.hasOwnProperty(key)) {
+                data[key].forEach((item) => {
+                    reverseMap.set(item, key)
+                })
+            }
+        }
+        return reverseMap
+    }
+
+    static findKeyByItem(reverseMap, itemToFind) {
+        return reverseMap.get(itemToFind) || null
+    }
+
+    static findKeyByName(data, itemToFind) {
+        const reverseMap = tool.createReverseMap(data)
+        return tool.findKeyByItem(reverseMap, itemToFind)
+    }
+    static addData(storage, key, value) {
+        if (!storage[key]) {
+            storage[key] = []
+        }
+        if (!storage[key].includes(value)) {
+            storage[key].push(value)
         }
     }
-    return reverseMap
-}
-
-function findKeyByItem(reverseMap, itemToFind) {
-    return reverseMap.get(itemToFind) || null
-}
-
-function findKeyByName(data, itemToFind) {
-    const reverseMap = createReverseMap(data)
-    return findKeyByItem(reverseMap, itemToFind)
-}
-function addData(storage, key, value) {
-    if (!storage[key]) {
-        storage[key] = []
-    }
-    if (!storage[key].includes(value)) {
-        storage[key].push(value)
+    static copy(text) {
+        var textarea = document.createElement("textarea")
+        textarea.textContent = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+            document.execCommand("copy")
+            console.log("复制成功", text)
+        } catch (err) {
+            console.error("复制失败: ", err)
+        } finally {
+            document.body.removeChild(textarea)
+        }
     }
 }
+
 // upgrade
 // 自动记录搜索关键字
 // 销量统计(合并)
