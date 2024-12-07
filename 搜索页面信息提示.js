@@ -10,6 +10,8 @@
 // @match        https://www.temu.com/*page_name=category*
 // @match        https://www.temu.com/search_result.html?search_key*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=temu.com
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setClipboard
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
 //脚本定制Q:605011383
@@ -49,6 +51,8 @@ function checkUrl() {
         setTimeout(() => {
             search_page()
         }, 2000)
+    } else {
+        pass
     }
 }
 
@@ -111,6 +115,7 @@ async function search_page() {
             // 复制id到粘贴板
             navigator.clipboard.writeText(id)
             tool.copy(id)
+            getdata(id)
         }
         // 设置button 的alt信息
         button.setAttribute("alt", "点击复制商品id")
@@ -197,3 +202,77 @@ class tool {
 // 自动记录搜索关键字
 // 销量统计(合并)
 // (可选店铺清空数据按钮)
+
+const headers = {
+    accept: "application/json, text/plain, */*",
+    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+    authorization: "",
+    origin: "https://www.geekbi.com",
+    priority: "u=1, i",
+    "sec-ch-ua": '"Microsoft Edge";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0",
+}
+function getdata(goodsId) {
+    // const goodsId = prompt("请输入商品ID:")
+    const params = {
+        goodsId: goodsId,
+        siteId: "49",
+    }
+
+    const url = `https://api.geekbi.com/api/v1/temu/goods/history?goodsId=${params.goodsId}&siteId=${params.siteId}`
+
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: url,
+        headers: headers,
+        onload: function (response) {
+            if (response.responseText.length > 200) {
+                const data = JSON.parse(response.responseText)
+                const goods = data.data.goods
+                const goodsName = goods.goodsName
+                const price = goods.minPrice
+                const sold = goods.sold
+                const daySold = goods.daySold
+                let createTime = goods.onSaleTime
+
+                try {
+                    createTime = createTime.substring(0, 10)
+                } catch (e) {
+                    console.log("时间格式不正确")
+                    console.log(createTime)
+                }
+
+                console.log("商品名称", goodsName)
+                console.log("销量", sold)
+                console.log("价格", price)
+                console.log("日销量", daySold)
+                console.log("上架时间", createTime)
+
+                const text = `${price}\t${sold}\t${daySold}\t${createTime}`
+                GM_setClipboard(text)
+                console.log("已复制到剪切板", text)
+            } else {
+                console.log("请求失败")
+                console.log(response.responseText)
+            }
+        },
+        onerror: function (error) {
+            console.log("请求失败", error)
+        },
+    })
+}
+
+
+fetch("https://api.temushuju.com/api/v1/goods/info?goodsId=601099526124341&region=211", {
+    "referrer": "",
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "body": null,
+    "method": "GET",
+    "mode": "cors",
+    "credentials": "omit"
+  });
